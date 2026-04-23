@@ -1,0 +1,48 @@
+const products = [
+  {
+    id: 1,
+    name: "Wireless Headphones",
+    description: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+    price: 89.99,
+    rating: 4.5,
+    reviews: 128,
+    inStock: true,
+    category: "Electronics",
+    image: "https://i.pinimg.com/736x/04/c6/ca/04c6ca905d9aafa678fbffe4941993ee.jpg",
+  },
+  {
+    id: 2,
+    name: "Laptop Stand",
+    description: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+    price: 49.99,
+    rating: 4.8,
+    reviews: 256,
+    inStock: true,
+    category: "Accessories",
+    image: "https://images-ext-1.discordapp.net/external/EksO6yvblehy4DMqFmj9jI1OA0RAoFyZxLyGG431zhQ/https/i.pinimg.com/736x/0c/bb/bb/0cbbbbb712d8d5f6bafe3adb4b7e8a5f.jpg?format=webp&width=1470&height=1176",
+  },
+  {
+    id: 3,
+    name: "Mechanical Keyboard",
+    description: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+    price: 129.99,
+    rating: 4.3,
+    reviews: 89,
+    inStock: false,
+    category: "Electronics",
+    image: "https://images-ext-1.discordapp.net/external/ulpyPU-dpm1apFh15SuQpZ7iwAQ8uGHhMGtQXFdlVSs/https/i.pinimg.com/736x/af/85/b9/af85b92334d9a9dfea5eb5927a8bc972.jpg?format=webp&width=830&height=846",
+  },
+  {
+    id: 4,
+    name: "USB-C Hub",
+    description: "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...",
+    price: 39.99,
+    rating: 4.6,
+    reviews: 342,
+    inStock: true,
+    category: "Accessories",
+    image: "https://images-ext-1.discordapp.net/external/KC_lS2qyqlhb1e7HYm8xN2LMRHrTLHsJ0CQVJo5SzZ8/https/i.pinimg.com/1200x/0d/07/d1/0d07d1bb91bd1a536efd159ae8c8ffba.jpg?format=webp&width=1902&height=1896",
+  },
+]
+
+export default products
