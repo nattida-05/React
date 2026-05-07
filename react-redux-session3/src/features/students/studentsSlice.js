@@ -29,5 +29,7 @@ reducers: {
     },
 },
 });
+
 // Named exports: action creators — used in components (Session 3)
+export const { addStudent, deleteStudent, updateStudent } = studentsSlice.actions;
 export default studentsSlice.reducer;

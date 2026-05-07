@@ -225,11 +225,11 @@
 
 .stat-label {
   display: block;
-  font-size: 0.875rem;
-  color: var(--text);
+  font-size: 0.9rem;
+  color: #475569;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-weight: 800;
   margin-bottom: 0.75rem;
 }
 
@@ -255,9 +255,12 @@
 }
 
 .add-form h3 {
-  color: var(--primary);
+  color: #0f172a;
   margin-bottom: 1.5rem;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .form-row {
@@ -278,16 +281,18 @@
 }
 
 .add-form input {
-  background: var(--bg-secondary);
-  color: var(--text-h);
-  font-weight: 500;
+  background: white;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 1rem;
+  border-color: var(--success);
 }
 
 .add-form input:focus {
   outline: none;
-  border-color: var(--primary);
+  border-color: var(--success);
   background: white;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 0 0 1px var(--primary);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15), inset 0 0 0 1px var(--success);
   transform: translateY(-2px);
 }
 
@@ -300,11 +305,11 @@
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
   border: none;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
@@ -363,7 +368,7 @@
 }
 
 .student-table thead {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: var(--primary);
   color: white;
 }
 
@@ -374,7 +379,7 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: var(--primary);
   position: relative;
 }
 
@@ -426,9 +431,10 @@
 
 .student-table td {
   padding: 1.25rem;
-  color: #1e293b;
-  font-weight: 700;
+  color: #0f172a;
+  font-weight: 800;
   transition: color 0.2s ease;
+  font-size: 1rem;
 }
 
 .gpa-cell {
@@ -451,6 +457,149 @@
   border: 2px dashed var(--border);
   animation: slideInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
   font-weight: 600;
+}
+
+/* ========== Action Buttons (Edit/Delete) ========== */
+.student-table td button {
+  padding: 0.6rem 1.2rem;
+  margin: 0 0.25rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.student-table td button:first-child {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+}
+
+.student-table td button:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+.student-table td button:first-child:active {
+  transform: translateY(0px);
+}
+
+.student-table td button:last-child {
+  background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+  color: white;
+}
+
+.student-table td button:last-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
+}
+
+.student-table td button:last-child:active {
+  transform: translateY(0px);
+}
+
+/* ========== Modal Overlay ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow-xl);
+  max-width: 500px;
+  width: 90%;
+  animation: slideInUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-content h3 {
+  color: #0f172a;
+  margin-bottom: 1.5rem;
+  font-size: 1.85rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-content input {
+  padding: 0.875rem 1rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-family: var(--sans);
+  color: #0f172a;
+  background: #ffffff;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), inset 0 0 0 1px var(--primary);
+  transform: translateY(-2px);
+}
+
+.modal-content button {
+  padding: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.modal-content form > button:first-of-type {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  font-weight: 800;
+}
+
+.modal-content form > button:first-of-type:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.modal-content form > button:last-of-type {
+  background: var(--bg-secondary);
+  color: #0f172a;
+  border: 2px solid #94a3b8;
+  font-weight: 800;
+}
+
+.modal-content form > button:last-of-type:hover {
+  border-color: var(--text);
+  background: var(--bg);
+  transform: translateY(-2px);
 }
 
 /* ========== Responsive Design ========== */
@@ -492,10 +641,6 @@
 
   .form-row {
     grid-template-columns: 1fr;
-  }
-}
-      box-sizing: border-box;
-    }
   }
 }
 
