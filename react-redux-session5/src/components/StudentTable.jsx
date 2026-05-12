@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import EditModal from './EditModal';
 
+// ✅ import จากที่เดียว ไม่ซ้ำ
 import {
   selectAllStudents,
   selectStudentsStatus,
@@ -16,10 +17,37 @@ import {
   updateStudentAsync,
 } from '../features/students/studentsThunks';
 
+// ✅ เอาไว้ใช้ใน StudentRow เท่านั้น
+import { selectStudentById } from '../features/students/studentsSlice';
+
+function StudentRow({ id, onEdit, onDelete }) {
+  const student = useSelector(state => selectStudentById(state, id));
+  if (!student) return null;
+
+  return (
+    <tr className={student.gpa >= 3.5 ? 'high-gpa' : ''}>
+      <td style={{ fontWeight: 800 }}>{student.name}</td>
+      <td className="td-id">{student.studentId}</td>
+      <td className="td-major">{student.major}</td>
+      <td>
+        <span className={`gpa-chip${student.gpa >= 3.5 ? ' high' : ''}`}>
+          {parseFloat(student.gpa).toFixed(2)}
+        </span>
+      </td>
+      <td>
+        <div className="row-actions">
+          <button className="btn-edit" onClick={() => onEdit(student)}>Edit</button>
+          <button className="btn-delete" onClick={() => onDelete(student.id)}>Delete</button>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 function StudentTable() {
   const students = useSelector(selectAllStudents);
-  const status   = useSelector(selectStudentsStatus);
-  const error    = useSelector(selectStudentsError);
+  const status = useSelector(selectStudentsStatus);
+  const error = useSelector(selectStudentsError);
   const dispatch = useDispatch();
 
   const [editing, setEditing] = useState(null);
@@ -59,9 +87,7 @@ function StudentTable() {
         </div>
 
         {students.length === 0 ? (
-          <div className="empty-state">
-            No students yet — add one above! 🎓
-          </div>
+          <div className="empty-state">No students yet — add one above! 🎓</div>
         ) : (
           <table className="student-table">
             <thead>
@@ -74,36 +100,14 @@ function StudentTable() {
               </tr>
             </thead>
             <tbody>
+              {/* ✅ ใช้ StudentRow แทน inline map */}
               {students.map(student => (
-                <tr
+                <StudentRow
                   key={student.id}
-                  className={student.gpa >= 3.5 ? 'high-gpa' : ''}
-                >
-                  <td style={{ fontWeight: 800 }}>{student.name}</td>
-                  <td className="td-id">{student.studentId}</td>
-                  <td className="td-major">{student.major}</td>
-                  <td>
-                    <span className={`gpa-chip${student.gpa >= 3.5 ? ' high' : ''}`}>
-                      {parseFloat(student.gpa).toFixed(2)}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="row-actions">
-                      <button
-                        className="btn-edit"
-                        onClick={() => setEditing(student)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn-delete"
-                        onClick={() => handleDelete(student.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                  id={student.id}
+                  onEdit={setEditing}
+                  onDelete={handleDelete}
+                />
               ))}
             </tbody>
           </table>

@@ -1,10 +1,12 @@
 // src/components/GpaSummary.jsx
+// Session 4 import:
+// import { selectAllStudents } from '../features/students/selectors';
+// Session 5 import (entity adapter exports it from the slice):
 import { useSelector } from 'react-redux';
-import {
-  selectStudentCount,
-  selectAverageGpa,
-  selectHighAchievers,
-} from '../features/students/selectors';
+import { selectAllStudents, selectStudentCount }
+from '../features/students/studentsSlice';
+import { selectAverageGpa, selectHighAchievers }
+from '../features/students/selectors';
 
 function GpaSummary() {
   const count    = useSelector(selectStudentCount);
