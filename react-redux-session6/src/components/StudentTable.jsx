@@ -1,127 +1,140 @@
-// src/components/StudentTable.jsx
 import { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-
-import EditModal from './EditModal';
-
-// ✅ import จากที่เดียว ไม่ซ้ำ
 import {
-  selectAllStudents,
-  selectStudentsStatus,
-  selectStudentsError,
-} from '../features/students/selectors';
+  useGetStudentsQuery,
+  useUpdateStudentMutation,
+} from '../features/students/studentsApi.js';
+import StudentRow from './StudentRow.jsx';
+import EditModal from './EditModal.jsx';
 
-import {
-  fetchStudents,
-  deleteStudentAsync,
-  updateStudentAsync,
-} from '../features/students/studentsThunks';
-
-// ✅ เอาไว้ใช้ใน StudentRow เท่านั้น
-import { selectStudentById } from '../features/students/studentsSlice';
-
-function StudentRow({ id, onEdit, onDelete }) {
-  const student = useSelector(state => selectStudentById(state, id));
-  if (!student) return null;
-
-  return (
-    <tr className={student.gpa >= 3.5 ? 'high-gpa' : ''}>
-      <td style={{ fontWeight: 800 }}>{student.name}</td>
-      <td className="td-id">{student.studentId}</td>
-      <td className="td-major">{student.major}</td>
-      <td>
-        <span className={`gpa-chip${student.gpa >= 3.5 ? ' high' : ''}`}>
-          {parseFloat(student.gpa).toFixed(2)}
-        </span>
-      </td>
-      <td>
-        <div className="row-actions">
-          <button className="btn-edit" onClick={() => onEdit(student)}>Edit</button>
-          <button className="btn-delete" onClick={() => onDelete(student.id)}>Delete</button>
-        </div>
-      </td>
-    </tr>
-  );
+function formatQueryError(error) {
+  if (error == null) {
+    return 'REQUEST FAILED';
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  if (typeof error === 'object' && 'status' in error) {
+    const data = error.data;
+    if (typeof data === 'string' && data) {
+      return data;
+    }
+    if (data != null && typeof data === 'object' && 'message' in data) {
+      return String(data.message);
+    }
+    return `HTTP ERROR ${error.status}`;
+  }
+  return String(error);
 }
 
 function StudentTable() {
-  const students = useSelector(selectAllStudents);
-  const status = useSelector(selectStudentsStatus);
-  const error = useSelector(selectStudentsError);
-  const dispatch = useDispatch();
-
+  const { data: students = [], isLoading, isError, error, refetch } =
+    useGetStudentsQuery();
+  const [updateStudent] = useUpdateStudentMutation();
   const [editing, setEditing] = useState(null);
 
-  if (status === 'loading') {
-    return <div className="spinner">⏳ Loading students...</div>;
-  }
-
-  if (status === 'failed') {
-    return (
-      <div className="error-banner">
-        <p>❌ Error: {error}</p>
-        <button onClick={() => dispatch(fetchStudents())}>Retry</button>
-      </div>
-    );
-  }
-
-  if (status !== 'succeeded') return null;
-
-  const handleDelete = id => {
-    if (window.confirm('ยืนยันการลบนักเรียนคนนี้?')) {
-      dispatch(deleteStudentAsync(id));
+  const handleEditSave = async (payload) => {
+    try {
+      await updateStudent(payload).unwrap();
+      setEditing(null);
+    } catch {
+      // Modal stays open; user can retry or cancel
     }
   };
 
-  const handleEditSave = updated => {
-    dispatch(updateStudentAsync(updated));
-    setEditing(null);
-  };
+  const showTable = !isLoading && !isError;
 
   return (
-    <>
-      <div className="table-wrap">
-        <div className="table-header">
-          <div className="table-title">Student Roster</div>
-          <span className="count-badge">{students.length} students</span>
-        </div>
+    <section className="panel panel-main">
+      <h2 className="panel-header">STUDENTS</h2>
+      <div className="table-scroll">
+        {isLoading ? (
+          <div
+            className="table-status-message"
+            style={{
+              padding: '24px 16px',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              fontSize: '12px',
+              letterSpacing: '0.12em',
+              color: '#888888',
+              borderBottom: '1px solid #333333',
+            }}
+          >
+            [ LOADING DATA... ]
+          </div>
+        ) : null}
 
-        {students.length === 0 ? (
-          <div className="empty-state">No students yet — add one above! 🎓</div>
-        ) : (
+        {isError ? (
+          <div
+            className="table-error-panel"
+            style={{
+              padding: '16px',
+              borderBottom: '1px solid #333333',
+            }}
+          >
+            <div
+              className="form-error"
+              style={{ margin: '0 0 12px 0' }}
+              role="alert"
+            >
+              {formatQueryError(error).toUpperCase()}
+            </div>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => refetch()}
+            >
+              RETRY
+            </button>
+          </div>
+        ) : null}
+
+        {showTable ? (
           <table className="student-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Student ID</th>
-                <th>Major</th>
+                <th>#</th>
+                <th>NAME</th>
+                <th>ID</th>
+                <th>MAJOR</th>
                 <th>GPA</th>
-                <th>Actions</th>
+                <th
+                  className="col-act"
+                  style={{ minWidth: '120px', width: 'auto' }}
+                >
+                  ACT
+                </th>
               </tr>
             </thead>
             <tbody>
-              {/* ✅ ใช้ StudentRow แทน inline map */}
-              {students.map(student => (
-                <StudentRow
-                  key={student.id}
-                  id={student.id}
-                  onEdit={setEditing}
-                  onDelete={handleDelete}
-                />
-              ))}
+              {students.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="empty-row">
+                    NO STUDENTS - ADD ONE FROM THE SIDEBAR.
+                  </td>
+                </tr>
+              ) : (
+                students.map((student, index) => (
+                  <StudentRow
+                    key={student.id}
+                    student={student}
+                    index={index}
+                    onEdit={setEditing}
+                  />
+                ))
+              )}
             </tbody>
           </table>
-        )}
+        ) : null}
       </div>
-
-      {editing && (
+      {editing ? (
         <EditModal
           student={editing}
           onSave={handleEditSave}
           onCancel={() => setEditing(null)}
         />
-      )}
-    </>
+      ) : null}
+    </section>
   );
 }
 

@@ -1,27 +1,59 @@
-// src/features/students/selectors.js — Session 5
 import { createSelector } from '@reduxjs/toolkit';
-import { selectAllStudents } from './studentsSlice';
-export { selectAllStudents } from './studentsSlice';
-// ── Primitive selectors (return scalars — no memoization needed)
-export const selectStudentsStatus = state => state.students.status;
-export const selectStudentsError = state => state.students.error;
-// ── Derived selectors (memoized — compute arrays or objects)
+import { studentsApi } from './studentsApi.js';
+
+const selectGetStudentsQueryResult =
+  studentsApi.endpoints.getStudents.select();
+
+export const selectAllStudents = createSelector(
+  [selectGetStudentsQueryResult],
+  (queryResult) => queryResult.data ?? [],
+);
+
 export const selectAverageGpa = createSelector(
-  selectAllStudents,
-  students => {
-    if (!students.length) return '—';
-    return (students.reduce((acc, s) => acc + s.gpa, 0) / students.length).toFixed(2);
-  }
+  [selectAllStudents],
+  (students) => {
+    if (students.length === 0) {
+      return '0.00';
+    }
+    const sum = students.reduce((acc, s) => {
+      const g = Number(s.gpa);
+      return acc + (Number.isFinite(g) ? g : 0);
+    }, 0);
+    return (sum / students.length).toFixed(2);
+  },
 );
+
 export const selectHighAchievers = createSelector(
-  selectAllStudents,
-  students => students.filter(s => s.gpa >= 3.5)
+  [selectAllStudents],
+  (students) =>
+    students.filter((s) => {
+      const g = Number(s.gpa);
+      return Number.isFinite(g) && g >= 3.5;
+    }),
 );
+
 export const selectGpaDistribution = createSelector(
-  selectAllStudents,
-  students => ({
-    high: students.filter(s => s.gpa >= 3.5).length,
-    medium: students.filter(s => s.gpa >= 2.5 && s.gpa < 3.5).length,
-    low: students.filter(s => s.gpa < 2.5).length,
-  })
+  [selectAllStudents],
+  (students) => {
+    let high = 0;
+    let medium = 0;
+    let low = 0;
+    for (const s of students) {
+      const g = Number(s.gpa);
+      const val = Number.isFinite(g) ? g : 0;
+      if (val >= 3.5) {
+        high += 1;
+      } else if (val >= 2.5) {
+        medium += 1;
+      } else {
+        low += 1;
+      }
+    }
+    return { high, medium, low };
+  },
+);
+
+export const selectStudentCount = createSelector(
+  [selectAllStudents],
+  (students) => students.length,
 );

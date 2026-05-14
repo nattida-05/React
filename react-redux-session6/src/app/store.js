@@ -1,15 +1,22 @@
 // src/app/store.js
+// The old studentsSlice/studentsThunks setup is gone — RTK Query replaces it.
 import { configureStore } from '@reduxjs/toolkit';
-import studentsReducer from '../features/students/studentsSlice';
-import coursesReducer  from '../features/courses/coursesSlice';
-import gradesReducer   from '../features/grades/gradesSlice';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import { studentsApi } from '../features/students/studentsApi';
+import coursesReducer from '../features/courses/coursesSlice';
+import gradesReducer from '../features/grades/gradesSlice';
 
 export const store = configureStore({
   reducer: {
-    students: studentsReducer, // → state.students
-    courses:  coursesReducer,  // → state.courses
-    grades:   gradesReducer,   // → state.grades
+    // RTK Query keeps its cache under state[studentsApi.reducerPath]
+    [studentsApi.reducerPath]: studentsApi.reducer,
+    courses: coursesReducer,
+    grades: gradesReducer,
   },
-  // redux-thunk included automatically
-  // Redux DevTools enabled in development
+  // The API middleware powers caching, invalidation, polling, and other features.
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(studentsApi.middleware),
 });
+
+// Enables refetchOnFocus / refetchOnReconnect behavior on the query hooks.
+setupListeners(store.dispatch);

@@ -1,98 +1,129 @@
-// src/components/AddStudentForm.jsx
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { addStudentAsync } from '../features/students/studentsThunks';
+import { useAddStudentMutation } from '../features/students/studentsApi.js';
 
-const EMPTY = { name: '', studentId: '', major: '', gpa: '' };
+const emptyForm = { name: '', studentId: '', major: '', gpa: '' };
 
 function AddStudentForm() {
-  const dispatch = useDispatch();
-  const [form, setForm] = useState(EMPTY);
+  const [addStudent, { isLoading }] = useAddStudentMutation();
+  const [formData, setFormData] = useState(emptyForm);
   const [error, setError] = useState('');
 
-  const onChange = e =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const validate = () => {
-    if (!form.name.trim())      return 'กรุณากรอกชื่อนักเรียน';
-    if (!form.studentId.trim()) return 'กรุณากรอก Student ID';
-    if (!form.major.trim())     return 'กรุณากรอกสาขาวิชา';
-    const gpa = parseFloat(form.gpa);
-    if (isNaN(gpa) || gpa < 0 || gpa > 4) return 'GPA ต้องอยู่ระหว่าง 0.00 - 4.00';
-    return '';
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const onSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const err = validate();
-    if (err) { setError(err); return; }
-    setError('');
-    await dispatch(addStudentAsync({ ...form, gpa: parseFloat(form.gpa) }));
-    setForm(EMPTY);
+
+    const name = formData.name.trim();
+    const studentId = formData.studentId.trim();
+    const major = formData.major.trim();
+    const gpaNum = parseFloat(formData.gpa);
+
+    if (!name || !studentId) {
+      setError('INVALID INPUT - NAME AND ID ARE REQUIRED');
+      return;
+    }
+
+    if (Number.isNaN(gpaNum) || gpaNum < 0 || gpaNum > 4) {
+      setError('INVALID INPUT - GPA MUST BE A NUMBER BETWEEN 0.00 AND 4.00');
+      return;
+    }
+
+    try {
+      await addStudent({
+        name,
+        studentId,
+        major,
+        gpa: gpaNum,
+      }).unwrap();
+      setFormData(emptyForm);
+      setError('');
+    } catch (err) {
+      const msg =
+        typeof err === 'string'
+          ? err
+          : err?.data != null
+            ? String(
+                typeof err.data === 'string'
+                  ? err.data
+                  : err.data?.message ?? err.error,
+              )
+            : err?.message ?? 'FAILED TO ADD STUDENT';
+      setError(String(msg).toUpperCase());
+    }
   };
 
   return (
-    <div className="card add-form">
-      <div className="card-title">Add New Student</div>
-
-      {error && <div className="form-error">{error}</div>}
-
-      <form onSubmit={onSubmit}>
+    <section className="panel">
+      <h2 className="panel-header">ADD STUDENT</h2>
+      <form onSubmit={handleSubmit} className="form-table" noValidate>
         <div className="form-row">
-          <div className="field">
-            <label htmlFor="name">Name</label>
-            <input
-              id="name"
-              name="name"
-              placeholder="Full name"
-              value={form.name}
-              onChange={onChange}
-            />
-          </div>
-
-          <div className="field">
-            <label htmlFor="studentId">Student ID</label>
-            <input
-              id="studentId"
-              name="studentId"
-              placeholder="e.g. S00123"
-              value={form.studentId}
-              onChange={onChange}
-            />
-          </div>
-
-          <div className="field">
-            <label htmlFor="major">Major</label>
-            <input
-              id="major"
-              name="major"
-              placeholder="e.g. Computer Science"
-              value={form.major}
-              onChange={onChange}
-            />
-          </div>
-
-          <div className="field">
-            <label htmlFor="gpa">GPA</label>
-            <input
-              id="gpa"
-              name="gpa"
-              type="number"
-              step="0.01"
-              min="0"
-              max="4"
-              placeholder="0.00 – 4.00"
-              value={form.gpa}
-              onChange={onChange}
-            />
-          </div>
+          <label htmlFor="name" className="form-label">
+            NAME
+          </label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            className="form-input"
+            autoComplete="off"
+          />
         </div>
-
-        <button type="submit" className="btn-primary">
-          + Add Student
+        <div className="form-row">
+          <label htmlFor="studentId" className="form-label">
+            ID
+          </label>
+          <input
+            id="studentId"
+            name="studentId"
+            type="text"
+            value={formData.studentId}
+            onChange={handleChange}
+            className="form-input"
+            autoComplete="off"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="major" className="form-label">
+            MAJOR
+          </label>
+          <input
+            id="major"
+            name="major"
+            type="text"
+            value={formData.major}
+            onChange={handleChange}
+            className="form-input"
+            autoComplete="off"
+          />
+        </div>
+        <div className="form-row">
+          <label htmlFor="gpa" className="form-label">
+            GPA
+          </label>
+          <input
+            id="gpa"
+            name="gpa"
+            type="text"
+            value={formData.gpa}
+            onChange={handleChange}
+            className="form-input"
+            inputMode="decimal"
+            autoComplete="off"
+          />
+        </div>
+        {error ? <div className="form-error">{error}</div> : null}
+        <button type="submit" className="btn-primary" disabled={isLoading}>
+          + ADD STUDENT
         </button>
       </form>
-    </div>
+    </section>
   );
 }
 

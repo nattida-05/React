@@ -1,9 +1,6 @@
 // src/App.jsx
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-
-import { fetchStudents } from './features/students/studentsThunks';
-
+// No useEffect / dispatch here — useGetStudentsQuery() in each component
+// handles fetching automatically (and shares one cached request).
 import GpaSummary from './components/GpaSummary';
 import AddStudentForm from './components/AddStudentForm';
 import StudentTable from './components/StudentTable';
@@ -11,17 +8,11 @@ import StudentTable from './components/StudentTable';
 import './App.css';
 
 function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchStudents());
-  }, [dispatch]);
-
   return (
     <div className="app-container">
       <header className="app-header">
         <h1>🎓 AcadeMate</h1>
-        <p>Student Grade Management System</p>
+        <p>Student Grade Management System (RTK Query)</p>
         <span className="header-badge">API Connected</span>
       </header>
 

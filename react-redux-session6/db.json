@@ -1,0 +1,9 @@
+{
+  "students": [
+    { "id": "1", "name": "Somchai Jaidee",  "studentId": "S00101", "major": "Computer Science",   "gpa": 3.85 },
+    { "id": "2", "name": "Suda Rakdee",     "studentId": "S00102", "major": "Information Systems","gpa": 3.42 },
+    { "id": "3", "name": "Manop Kongsri",   "studentId": "S00103", "major": "Software Engineering","gpa": 2.95 },
+    { "id": "4", "name": "Nattida Tanorthong","studentId": "S00104","major": "Data Science",      "gpa": 3.92 },
+    { "id": "5", "name": "Anan Sukjai",     "studentId": "S00105", "major": "Cybersecurity",      "gpa": 2.10 }
+  ]
+}
