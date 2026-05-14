@@ -61,16 +61,30 @@ export const studentsApi = createApi({
       invalidatesTags: [{ type: 'LIST', id: 'LIST' }],
     }),
     updateStudent: build.mutation({
-      query: (student) => ({
-        url: `students/${student.id}`,
+      query: ({ id, ...patch }) => ({
+        url: `students/${id}`,
         method: 'PUT',
-        body: {
-          name: student.name,
-          studentId: student.studentId,
-          major: student.major,
-          gpa: student.gpa,
-        },
+        body: patch,
       }),
+      async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
+        const patchList = dispatch(
+          studentsApi.util.updateQueryData('getStudents', undefined, (draft) => {
+            const item = draft.find((s) => s.id === id);
+            if (item) Object.assign(item, patch);
+          }),
+        );
+        const patchDetail = dispatch(
+          studentsApi.util.updateQueryData('getStudentById', id, (draft) => {
+            Object.assign(draft, patch);
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchList.undo();
+          patchDetail.undo();
+        }
+      },
       transformResponse: (raw) => normalizeStudent(raw),
       invalidatesTags: (_result, _error, arg) => [
         { type: 'Student', id: String(arg.id) },

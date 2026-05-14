@@ -5,6 +5,7 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { studentsApi } from '../features/students/studentsApi';
 import coursesReducer from '../features/courses/coursesSlice';
 import gradesReducer from '../features/grades/gradesSlice';
+import loggerMiddleware from '../middleware/logger';
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,7 @@ export const store = configureStore({
   },
   // The API middleware powers caching, invalidation, polling, and other features.
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(studentsApi.middleware),
+    getDefaultMiddleware().concat(studentsApi.middleware).concat(loggerMiddleware),
 });
 
 // Enables refetchOnFocus / refetchOnReconnect behavior on the query hooks.
